@@ -18,6 +18,7 @@ package com.example.android.camera.utils
 
 import android.content.Context
 import android.hardware.camera2.CameraCharacteristics
+import android.util.Log
 import android.view.OrientationEventListener
 import android.view.Surface
 import androidx.lifecycle.LiveData
@@ -35,6 +36,7 @@ class OrientationLiveData(
 
     private val listener = object : OrientationEventListener(context.applicationContext) {
         override fun onOrientationChanged(orientation: Int) {
+            Log.i("lierjian", "onOrientationChanged: $orientation")
             val rotation = when {
                 orientation <= 45 -> Surface.ROTATION_0
                 orientation <= 135 -> Surface.ROTATION_90
@@ -82,7 +84,7 @@ class OrientationLiveData(
                 Surface.ROTATION_270 -> 270
                 else -> 0
             }
-
+            Log.i("lierjian", "computeRelativeRotation: $sensorOrientationDegrees, $deviceOrientationDegrees")
             // Reverse device orientation for front-facing cameras
             val sign = if (characteristics.get(CameraCharacteristics.LENS_FACING) ==
                     CameraCharacteristics.LENS_FACING_FRONT) 1 else -1

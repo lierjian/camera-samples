@@ -43,6 +43,10 @@
             app:launchSingleTop="true"
             app:destination="@id/camera_fragment" />
 
+        <action
+            android:id="@+id/action_selector_to_multi_camera_preview"
+            app:launchSingleTop="true"
+            app:destination="@id/multi_camera_preview_fragment" />
     </fragment>
 
     <fragment
@@ -71,6 +75,34 @@
             app:launchSingleTop="true"
             app:destination="@id/image_viewer_fragment" />
 
+    </fragment>
+
+    <fragment
+        android:id="@+id/multi_camera_preview_fragment"
+        android:name="com.example.android.camera2.basic.fragments.MultiCameraPreviewFragment"
+        android:label="Camera" >
+
+        <argument
+            android:name="camera_id1"
+            app:argType="string"
+            app:nullable="false"/>
+
+        <argument
+            android:name="camera_id2"
+            app:argType="string"
+            app:nullable="false"
+            />
+
+        <argument
+            android:name="pixel_format"
+            app:argType="integer"
+            app:nullable="false"/>
+
+        <action
+            android:id="@+id/action_camera_to_permissions"
+            app:destination="@id/permissions_fragment"
+            app:popUpTo="@id/multi_camera_preview_fragment"
+            app:popUpToInclusive="true"/>
     </fragment>
 
     <fragment

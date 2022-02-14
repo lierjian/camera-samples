@@ -31,6 +31,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.android.camera.utils.BindCallback
 import com.example.android.camera.utils.GenericListAdapter
 import com.example.android.camera2.basic.R
 
@@ -55,19 +56,34 @@ class SelectorFragment : Fragment() {
             val cameraList = enumerateCameras(cameraManager)
 
             val layoutId = android.R.layout.simple_list_item_1
-            adapter = GenericListAdapter(cameraList, itemLayoutId = layoutId) { view, item, _ ->
+            adapter = GenericListAdapter(cameraList, itemLayoutId = layoutId) { view, item, pos ->
                 view.findViewById<TextView>(android.R.id.text1).text = item.title
                 view.setOnClickListener {
-                    Navigation.findNavController(requireActivity(), R.id.fragment_container)
-                            .navigate(SelectorFragmentDirections.actionSelectorToCamera(
-                                    item.cameraId, item.format))
+                    if (item.title.equals(MULTI_PREVIEW_TITLE)) {
+                        val cameraIds = item.cameraId.split("_")
+                        if (cameraIds.isNullOrEmpty() || cameraIds.size < 2) {
+                            return@setOnClickListener
+                        }
+                        Navigation.findNavController(requireActivity(), R.id.fragment_container)
+                            .navigate(SelectorFragmentDirections.actionSelectorToMultiCameraPreview(
+                                cameraIds[0], cameraIds[1], item.format))
+                    } else {
+                        Navigation.findNavController(requireActivity(), R.id.fragment_container)
+                            .navigate(
+                                SelectorFragmentDirections.actionSelectorToCamera(
+                                    item.cameraId, item.format
+                                )
+                            )
+                    }
                 }
             }
+
         }
 
     }
 
     companion object {
+        private const val MULTI_PREVIEW_TITLE = "multi_preview"
 
         /** Helper class used as a data holder for each selectable camera format item */
         private data class FormatItem(val title: String, val cameraId: String, val format: Int)
@@ -128,6 +144,10 @@ class SelectorFragment : Fragment() {
                 }
             }
 
+            if (cameraIds.size >= 2) {
+                //availableCameras.add(FormatItem(MULTI_PREVIEW_TITLE, "${cameraIds[0]}_${cameraIds[1]}", ImageFormat.YUV_422_888))
+                availableCameras.add(FormatItem(MULTI_PREVIEW_TITLE, "${cameraIds[0]}_${cameraIds[1]}", ImageFormat.RAW_SENSOR))
+            }
             return availableCameras
         }
     }

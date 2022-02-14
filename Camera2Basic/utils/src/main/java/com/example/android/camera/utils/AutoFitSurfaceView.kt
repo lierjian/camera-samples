@@ -33,7 +33,7 @@ class AutoFitSurfaceView @JvmOverloads constructor(
 ) : SurfaceView(context, attrs, defStyle) {
 
     private var aspectRatio = 0f
-
+    private var scaleType = ScaleType.CENTER_CROP
     /**
      * Sets the aspect ratio for this view. The size of the view will be
      * measured based on the ratio calculated from the parameters.
@@ -48,10 +48,15 @@ class AutoFitSurfaceView @JvmOverloads constructor(
         requestLayout()
     }
 
+    fun setScaleType(scaleType: ScaleType) {
+        this.scaleType = scaleType
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val height = MeasureSpec.getSize(heightMeasureSpec)
+        Log.d(TAG, "onMeasure: $width x $height")
         if (aspectRatio == 0f) {
             setMeasuredDimension(width, height)
         } else {
@@ -60,17 +65,32 @@ class AutoFitSurfaceView @JvmOverloads constructor(
             val newWidth: Int
             val newHeight: Int
             val actualRatio = if (width > height) aspectRatio else 1f / aspectRatio
-            if (width < height * actualRatio) {
-                newHeight = height
-                newWidth = (height * actualRatio).roundToInt()
+            if (scaleType == ScaleType.CENTER_CROP) {
+                if (width < height * actualRatio) {
+                    newHeight = height
+                    newWidth = (height * actualRatio).roundToInt()
+                } else {
+                    newWidth = width
+                    newHeight = (width / actualRatio).roundToInt()
+                }
             } else {
-                newWidth = width
-                newHeight = (width / actualRatio).roundToInt()
+                if (width < height * actualRatio) {
+                    newWidth = width
+                    newHeight = (width/actualRatio).roundToInt()
+                } else {
+                    newHeight = height
+                    newWidth = (height * actualRatio).roundToInt()
+                }
             }
 
             Log.d(TAG, "Measured dimensions set: $newWidth x $newHeight")
             setMeasuredDimension(newWidth, newHeight)
         }
+    }
+
+    enum class ScaleType {
+        CENTER_CROP,
+        CENTER_INSIDE
     }
 
     companion object {
